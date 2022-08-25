@@ -38,30 +38,65 @@ void ReadEverythingFromFile(students student[], lecturers lecturer[], int *stude
 void encrypt(char password[]);
 void decrypt(char password[]);
 
+void printLogo()
+{
+    printf(" __ _             _            _      _____        __                            _   _             \n"
+           "/ _\\ |_ _   _  __| | ___ _ __ | |_    \\_   \\_ __  / _| ___  _ __ _ __ ___   __ _| |_(_) ___  _ __  \n"
+           "\\ \\| __| | | |/ _` |/ _ \\ '_ \\| __|    / /\\/ '_ \\| |_ / _ \\| '__| '_ ` _ \\ / _` | __| |/ _ \\| '_ \\ \n"
+           "_\\ \\ |_| |_| | (_| |  __/ | | | |_  /\\/ /_ | | | |  _| (_) | |  | | | | | | (_| | |_| | (_) | | | |\n"
+           "\\__/\\__|\\__,_|\\__,_|\\___|_| |_|\\__| \\____/ |_| |_|_|  \\___/|_|  |_| |_| |_|\\__,_|\\__|_|\\___/|_| |_|\n"
+           "                                                                                                   \n"
+           "                            __           _                                                         \n"
+           "                           / _\\_   _ ___| |_ ___ _ __ ___                                          \n"
+           "                           \\ \\| | | / __| __/ _ \\ '_ ` _ \\                                         \n"
+           "                           _\\ \\ |_| \\__ \\ ||  __/ | | | | |                                        \n"
+           "                           \\__/\\__, |___/\\__\\___|_| |_| |_|                                        \n"
+           "                               |___/                                                               \n");
+}
+
 // using argv and argc to take type of user, user number and password from user
 int main(int argc, char const *argv[])
 {
     setlocale(LC_ALL, "Turkish.turkish.1254");
     SetConsoleCP(1254);
     SetConsoleOutputCP(1254);
-    printf("You need to open file as ./main type username password\n");
 
     int studentCount = 0;
     int lecturerCount = 0;
-
     char tempNumberString[20];
     char studentAfPassword[20];
     char adminPassword[20];
+
+    char authority[20];
+    char userName[20];
+    char userPassword[20];
+
     students student[100];
     lecturers lecturer[4];
     ReadEverythingFromFile(student, lecturer, &studentCount, &lecturerCount, studentAfPassword, adminPassword);
 
     // send the user to chosen menu with if else statements
     // also every menu is a function
-    if (strcmp(strlwr(argv[1]), "admin") == 0)
+
+    printLogo();
+    printf("\nWhat is the user's authorization?\nAdmin/Student Affair/Lecturer/Student\n");
+    scanf("%s", authority);
+    if (strcmp(strlwr(authority), "lecturer") == 0 || strcmp(strlwr(authority), "student") == 0)
     {
-        if (strcmp(argv[3], adminPassword) == 0)
+        printf("What is the user's username?\n");
+        scanf("%s", userName);
+    }
+
+    printf("What is the user's password?\n");
+    scanf("%s", userPassword);
+
+    system("cls");
+    printLogo();
+    if (strcmp(strlwr(authority), "admin") == 0)
+    {
+        if (strcmp(userPassword, adminPassword) == 0)
         {
+
             adminPanel(adminPassword, studentAfPassword, lecturerCount, lecturer);
         }
         else
@@ -69,36 +104,39 @@ int main(int argc, char const *argv[])
             printf("Wrong password\n");
         }
     }
-    else if (strcmp(strlwr(argv[1]), "lecturer") == 0)
+    else if (strcmp(strlwr(authority), "lecturer") == 0)
     {
         for (int i = 0; i < lecturerCount; i++)
         {
-            if (strcmp(argv[2], lecturer[i].id) == 0 && strcmp(argv[3], lecturer[i].password) == 0)
+            if (strcmp(userName, lecturer[i].id) == 0 && strcmp(userPassword, lecturer[i].password) == 0)
             {
-                lecturerPanel(argv[2], argv[3], lecturer, student);
+
+                lecturerPanel(userName, userPassword, lecturer, student);
                 break;
             }
         }
         printf("Wrong username or password\n");
     }
-    else if (strcmp(strlwr(argv[1]), "student") == 0)
+    else if (strcmp(strlwr(authority), "student") == 0)
     {
         for (int i = 0; i < studentCount; i++)
         {
             itoa(student[i].number, tempNumberString, 10);
-            if (strcmp(argv[2], tempNumberString) == 0 && strcmp(argv[3], student[i].password) == 0)
+            if (strcmp(userName, tempNumberString) == 0 && strcmp(userPassword, student[i].password) == 0)
             {
-                studentPanel(argv[2], student, lecturer, studentCount);
+
+                studentPanel(userName, student, lecturer, studentCount);
                 break;
             }
             printf("Wrong username or password\n");
         }
     }
-    else if (strcmp(strlwr(argv[1]), "studentaffair") == 0)
+    else if (strcmp(strlwr(authority), "studentaffair") == 0)
     {
-        if (strcmp(argv[3], studentAfPassword) == 0)
+        if (strcmp(userPassword, studentAfPassword) == 0)
         {
-            studentAffairPanel(student, argv[2], &studentCount, studentAfPassword, lecturer, &lecturerCount);
+
+            studentAffairPanel(student, userName, &studentCount, studentAfPassword, lecturer, &lecturerCount);
         }
     }
     else
